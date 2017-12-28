@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="Author" content="海牙老师">
+
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/myAjax.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="movie" style="left:0px;top:0px;">
+        <a href="#" target="_blank">
+            <img class='pic' src="" height="auto" width="200">
+        </a>
+
+        <p class="year">
+            <i class="ml15">1994</i>
+            <span class="mr15">shanghai</span>
+        </p>
+
+        <p class="movie_info">
+            <span class="title ml15">肖申克的救赎</span>
+            <span class="score mr15">9.6</span>
+        </p>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    //需求分析:
+    /*
+     0:初始化项目--
+        A:初始化盒子宽度
+        B:获取浏览器宽度
+        c:初始化函数
+        D:设置container宽度
+     1:获取数据  --
+        ajax ,0-10,10-20...分段读取.
+        ajax二次封装:
+
+     2:整理数据  --
+        需要:title,original_title,score,year,img-src
+        数据拆分/重组/遍历
+     3:渲染数据  --
+        数据解析,
+
+     4:瀑布流算法 --
+     5:懒加载     --
+     6:缓存代理机制--
+     */
+
+    const URL = 'http://120.77.174.93/dbmovie',
+            count=20;
+
+    var width = 200,
+            space = 10,
+            outerWidth = width + space,
+            num = 0,
+            oCon = document.querySelector('.container'),
+            wW = window.innerWidth; //浏览器宽度
+
+    colls();
+    //整理数据
+    function formatData(data){
+        var movie = [];
+        data.forEach(function(item){
+            movie.push({
+                title:item.title,
+                coverImg:item.images.large,
+                original_title: item.original_title,
+                year:item.year,
+                score:item.rating.average
+
+            })
+        })
+        console.log(movie);
+        return movie;
+    }
+
+    //数据模板
+    function renderData(data){
+        var index = 0;
+        var length = data.length;
+        //var item = data[5];
+        console.log(111,data[0]);
+
+        //递归渲染
+        (function recur(){  //自执行
+            var item = data[index];
+
+            var oDiv = document.createElement('div');
+            oDiv.className = 'movie';
+            oDiv.innerHTML = `
+               <a href="#" target="_blank">
+            <img class='pic' src="${item.coverImg}" height="auto" width="200">
+        </a>
+
+        <p class="year">
+            <i class="ml15">1994</i>
+            <span class="mr15">${item.original_title}</span>
+        </p>
+
+        <p class="movie_info">
+            <span class="title ml15">${item.title}</span>
+            <span class="score mr15">${item.score}</span>
+        </p>
+        `;
+            //console.log(888,oDiv);
+
+            oCon.appendChild(oDiv);
+            index++;
+            index<length&&recur(); //短路执行
+
+        })();
+
+    }
+
+
+    //数据获取
+    function getData(opt){
+        myAjax({
+            url:URL,
+            data:opt.data,
+            method :'GET',
+            success:function(res){
+                //console.log(222,res);
+                var data = JSON.parse(res);
+                opt['callBack'] && opt['callBack'](data);
+            }
+
+        });
+    }
+
+    getData({
+        data:{
+            start:0,
+            count:count
+        },
+        callBack:function(res){
+            var movie = formatData(res);
+            renderData(movie);// 把整理好的数据渲染.
+        }
+    });
+
+
+
+    //格式真理
+    function colls() {
+        num = ~~(wW / outerWidth); //算几列
+        oCon.style.width =num*outerWidth -space +'px';
+
+    }
+
+
+</script>
+
+
+</body>
+</html>
+<!--
+    parseInt:
+    Math.floor:
+    位运算: (wW / outerWidth) | 0 , (wW / outerWidth) >> 0,~~(wW / outerWidth);
+    位运算比1,2方法要效率高.
+
+    1:querySelector,querySelectorAll:类似$选择器;h5的dom扩展api,兼容到ie8;
+    2:getElementsByClassname的兼容性问题.$(10) > query()系列 > getElement系列
+    3:选择器dom对象动态与静态:get系列大多是动态的, query系列和$都是静态选择器
+    4:DTD:DOCTYPE决定dom的兼容性.
+
+
+    后端直接给前端对象和eval非常危险,传字符串就好.
+    showapi.com 练习数据整理.
+    es6 文本域;
+    纯函数: 输入--处理--输出--不对外界产生反应.好处:拿到哪里都能用,出bug少
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

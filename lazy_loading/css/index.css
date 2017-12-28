@@ -1,0 +1,23 @@
+* { margin: 0; padding: 0; }
+
+a { text-decoration: none; color: #333333; }
+
+ul, li { list-style: none; }
+
+body { font-size: 14px; font-family: "微软雅黑"; background: rgba(89, 176, 236, 0.44); }
+
+.ml15 { margin-left: 15px; }
+
+.mr15 { margin-right: 15px; }
+
+.container { margin: 30px auto; position: relative; width: 100%; }
+
+.movie { width: 200px; display: flex; flex-direction: column; box-shadow: 1px 1px 1em #dddddd; position: absolute; top: 0; left: 0; transition: 1s; }
+
+.movie img, .movie a { display: block; }
+
+.movie .year { height: 30px; line-height: 30px; background: #f7e9ee; display: flex; justify-content: space-between; }
+
+.movie .year span { text-align: right; }
+
+.movie .movie_info { display: flex; justify-content: space-between; background: #f7e9ee; padding-bottom: 5px; }

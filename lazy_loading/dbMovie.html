@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="Author" content="海牙老师">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/myAjax.js"></script>
+</head>
+<body>
+<div class="container"></div>
+<script>
+    /*
+
+        需求分析
+            0. 初始化项目
+                1. 初始化盒子宽度
+                2. 初始化单个宽度
+                3. 初始化单行数量
+            1. 获取数据
+                1. ajax交互
+                    1.URL 地址
+                    2.data 参数
+                    3.success 回调函数
+                2. ajax二次封装
+                    1.参数变量
+                    2.二次回调
+            2. 整理数据
+                1. 数据分析
+                    1. JSON.parse 与 JSON.stringify
+                2. 数据分拣
+                    1. forEach 迭代
+                3. 数据重组
+                    1. return 纯函gf数
+            3. 渲染数据
+                1. 数据数组分析
+                2. 单步渲染
+                3. 尺寸计算
+                4. 数组映射计算最小值
+            4. 瀑布流算法
+                1. T&L 初始化
+                2. T&L 最小值重写
+            5. 预存数据
+                1. 渲染后拉取后20条数据 预存原理
+                2. 预存优势
+            6. 用户监听
+                1.监听scroll滚动条改变
+                2.滚动高度 > 最后一个div的 中心线高度
+                3.从缓存池渲染数据
+
+    */
+
+    const URL = 'http://120.77.174.93/dbmovie',
+          count = 20,
+	      defaultUrl = 'http://img3.doubanio.com/view/movie_poster_cover/lpst/public/p510876377.jpg';
+    var oCon = document.querySelector('.container'), //获取大包围
+        width = 200,                                 //宽度
+        space = 10,                                  //间隙
+        outerWidth = width + space,                  //单个元素宽度
+        num = 0,
+        arrTop = [],                                 //top数组
+        arrLeft = [],                                //left 数组
+        outTime = null,                              //延迟
+        lastDom = null,                              //最后一个节点
+        start = 0,
+        toggle = false;                              //可不可以滚动加载
+
+    var cache = [];  //缓存池
+
+    cells();
+
+
+    getData({
+        data: {
+            start: start,
+            count: count
+        },
+        callBack: function (res) {
+            var postData = formatData(res);
+            renderData(postData);
+        }
+    });
+
+
+    //监听滚动
+    window.addEventListener('scroll', function () {
+
+        //懒加载 监听滚动条滚动
+        if (toggle) {
+            var sheight = document.body.scrollTop + window.innerHeight; //获取滚动高度
+            var lastIndexHeight = lastDom.offsetTop + (lastDom.offsetHeight / 2); //临界点高度
+            if (lastIndexHeight < sheight) {
+                toggle = false;
+                renderData(cache);
+            }
+        }
+    });
+
+
+    //初始格式化
+    function cells() {
+        num = ~~(window.innerWidth / outerWidth); // 一行放几个
+        oCon.style.width = num * outerWidth - space + 'px'; //总数量乘以单个宽度 - 最后一个的间隙
+        for (var i = 0; i < num; i++) {
+            arrTop.push(0);
+            arrLeft.push(i * outerWidth);
+        }
+    }
+
+    //数据获取
+    function getData(opt) {
+        myAjax({
+            url: 'http://120.77.174.93/dbmovie',
+            data: opt.data,
+            method: 'GET',
+            success: function (res) {
+                var data = JSON.parse(res);
+                opt.callBack && opt.callBack(data);
+            }
+        })
+    }
+
+    //数据整理
+    function formatData(data) {
+        var movie = []; //空数组
+        data.forEach(function (item) {
+            movie.push({
+                title: item.title,                   //译名
+                original_title: item.original_title, //原名
+                score: item.rating.average||defaultUrl,          //评分
+                year: item.year,                     //年份
+                coverImg: item.images.large          //图片
+            })
+        });
+        return movie;
+    }
+
+    //数据渲染
+    function renderData(data) {
+        var length = data.length; //获取数据长度
+
+        var index = 0;            //下标
+        ~~function recur() {
+            var item = data[index];
+            var minIndex = arrTop.indexOf(Math.min(...arrTop));
+            var oDiv = document.createElement('div');
+            oDiv.className = 'movie';
+            oDiv.style.top = oDiv.style.left = 0 + 'px';
+            oDiv.innerHTML = `
+                 <a href="#" target="blank">
+				    <img class="pic" src="${item.coverImg}" width="200" height="auto">
+				 </a>
+				<p class="year">
+					<i class="ml15">${item.year}</i>
+					<span class="mr15">${item.original_title}</span>
+				</p>
+				<p class="movie_info">
+					<span class="title ml15">${item.title}</span>
+					<span class="score mr15">${item.score}</span>
+				</p>`;
+            oCon.appendChild(oDiv);
+			//oDiv.querySelector('img').onerror = function(){
+			//	this.src = defaultUrl;
+			//}
+            oDiv.querySelector('img').onload = function () {
+                clearTimeout(outTime);
+                outTime = setTimeout(function () {
+                    oDiv.style.left = arrLeft[minIndex] + 'px';
+                    oDiv.style.top = arrTop[minIndex] + 'px';
+                    arrTop[minIndex] += oDiv.offsetHeight + 2 * space;
+                    index++;
+                    (index === length - 1) && (lastDom = oDiv, toggle = true);
+                    (index < length) && recur();
+                }, 50)
+            }
+        }();
+        start += 20;
+        getData({
+            data: {
+                start: start,
+                count: count
+            },
+            callBack: function (res) {
+                cache = [];
+                var postData = formatData(res);
+                cache = postData; //缓存数据
+
+            }
+        });
+        console.log(start, count);
+    }
+
+
+</script>
+</body>
+</html>
