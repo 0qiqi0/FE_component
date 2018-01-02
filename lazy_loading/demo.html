@@ -30,39 +30,66 @@
 </div>
 
 <script type="text/javascript">
-    //需求分析:
+    //分析:
     /*
-     0:初始化项目--
+     0:初始化--
         A:初始化盒子宽度
         B:获取浏览器宽度
         c:初始化函数
         D:设置container宽度
-     1:获取数据  --
+     1:获取数据--
         ajax ,0-10,10-20...分段读取.
         ajax二次封装:
 
-     2:整理数据  --
+     2:整理数据--
         需要:title,original_title,score,year,img-src
         数据拆分/重组/遍历
-     3:渲染数据  --
-        数据解析,
+     3:渲染数据--
+        数据数组解析,循环创建,dom操作
 
-     4:瀑布流算法 --
-     5:懒加载     --
+     4:瀑布流算法--
+        初始化arrtop,arrleft,找到高度最小的一个.
+
+     5:懒加载--
+        滚动到指定位置时加载.计算:滚动高度+ 浏览器高度 >=元素top
+
      6:缓存代理机制--
      */
 
     const URL = 'http://120.77.174.93/dbmovie',
             count=20;
 
-    var width = 200,
+    var width = 200,start = 0,
             space = 10,
             outerWidth = width + space,
             num = 0,
             oCon = document.querySelector('.container'),
+            arrTop =[],arrLeft =[],outTimer,lastDom =null,toggle = false,  //存第一行的
             wW = window.innerWidth; //浏览器宽度
 
     colls();
+
+    window.addEventListener('scroll',function(){
+        var sheight = document.body.scrollTop + window.innerHeight;
+        if(toggle){
+            var lastIndexHeight = lastDom.offsetTop + (lastDom.offsetHeight/2);
+            if(lastIndexHeight < sheight){
+                toggle =false;
+                getData({
+                    data:{
+                        start:start,
+                        count:count
+                    },
+                    callBack:function(res){
+                        var movie = formatData(res);
+                        renderData(movie);// 把整理好的数据渲染.
+                    }
+                });
+            }
+
+        }
+    });
+
     //整理数据
     function formatData(data){
         var movie = [];
@@ -87,9 +114,11 @@
         //var item = data[5];
         console.log(111,data[0]);
 
+        //等前一条数据渲染完后,在渲染第二个
         //递归渲染
         (function recur(){  //自执行
             var item = data[index];
+            var minIndex = arrTop.indexOf(Math.min(...arrTop)); //高度最小的值的元素下标
 
             var oDiv = document.createElement('div');
             oDiv.className = 'movie';
@@ -109,12 +138,28 @@
         </p>
         `;
             //console.log(888,oDiv);
+            oDiv.style.top = oDiv.style.left = '0px';
+
+            //oDiv.style.top = arrTop[index] + 'px';
+            //oDiv.style.left = arrLeft[index] + 'px';
 
             oCon.appendChild(oDiv);
-            index++;
-            index<length&&recur(); //短路执行
+            oDiv.querySelector('img').onload = function(){
+                clearTimeout(outTimer);
+                outTimer = setTimeout(function(){
+                    oDiv.style.left = arrLeft[minIndex] + 'px';
+                    oDiv.style.top =  arrTop[minIndex] + 'px';
+                    arrTop[minIndex] +=oDiv.offsetHeight + 2*space;
+                    index++;
+
+                    (index ===length -1) &&(lastDom = oDiv,toggle=true);
+                    index<length&&recur(); //短路执行
+                },50);
+            }
 
         })();
+        start +=20;
+
 
     }
 
@@ -147,10 +192,14 @@
 
 
 
-    //格式真理
+    //格式整理
     function colls() {
         num = ~~(wW / outerWidth); //算几列
         oCon.style.width =num*outerWidth -space +'px';
+        for(var i=0;i<num;i++){
+            arrTop.push(0);
+            arrLeft.push(i*outerWidth);
+        }
 
     }
 
