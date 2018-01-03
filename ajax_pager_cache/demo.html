@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="Author" content="海牙">
+    <link rel="stylesheet" href="demo.css" type="text/css">
+</head>
+
+<body>
+
+<div class="wrap flex_column">
+
+    <div class="content flex_column">
+       <!-- <a href="http://mp.weixin.qq.com/s/hSI0RNGR23KetTFLoYP7dQ" class="items flex_row">
+            <div class="img"><img src="http://www.tanzhouphp.com/tanzhoue/images/newsList/1.jpg" alt=""></div>
+            <div class="bd">
+                <p class="label">说来也是惨，古生物学家好像特别容易被假化石坑到呢……</p>
+            </div>
+            <div class="ft">&GT;</div>
+        </a>-->
+    </div>
+
+    <div class="page">
+        <ul class="flex_row">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    /*
+        分析:
+            获取数据(ajax-fetch)
+                //https://route.showapi.com/181-1?
+                showapi_appid=30603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8
+                增加安全性:md5加密和sha1加密
+
+            分析-渲染数据
+
+            分页处理
+
+    */
+
+
+    var url = 'https://route.showapi.com/181-1';
+            //'?showapi_appid=30' +
+            //'603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8'
+
+    var oCon = document.querySelector('.content');
+
+    var page =1;
+    getJson();
+
+    function getJson(){
+        var params = [];
+        var sendData = {
+            showapi_appid:'30603',
+            showapi_sign :'98960666afeb4992ae91971d13494090',
+            page:page,
+            num:8
+        }
+
+        for(var key in sendData){
+            params.push(key+'='+sendData[key]);
+        }
+        var postData = params.join('&');
+
+        var xmlHttp = new XMLHttpRequest();
+
+        xmlHttp.open('GET',url+'?'+postData,true); //建立信道.
+        xmlHttp.send(null);
+        xmlHttp.onreadystatechange = function(){
+            //复习:0:未初始化 1:调用额了send,正在发送
+            //    2:send发送完成,3:解析响应内容;4解析完成,可以使用数据
+            if(xmlHttp.readyState ===4 && xmlHttp.status ===200){
+                var data  = JSON.parse(xmlHttp.response);
+                showPage(data)
+            }
+        }
+    }
+
+    //渲染数据:
+    function showPage (data){
+
+        var data =data.showapi_res_body.newslist;
+        var str ='';
+        for(var i= 0,len=data.length;i<len;i++){
+
+            str +=`<a href="${data[i].url}" class="items flex_row">`+
+                    `<div class="img"><img src="${data[i].picUrl}" alt=""></div>`+
+                    `<div class="bd">`+
+                    `<p class="label">${data[i].title}</p>`+
+                    `</div>`+
+                    `<div class="ft">&GT;</div>`+
+                    `</a>`;
+
+        }
+
+        oCon.innerHTML = str;
+    }
+
+
+
+</script>
+</body>
+</html>
