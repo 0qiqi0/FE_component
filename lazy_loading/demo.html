@@ -67,7 +67,21 @@
             arrTop =[],arrLeft =[],outTimer,lastDom =null,toggle = false,  //存第一行的
             wW = window.innerWidth; //浏览器宽度
 
+    var cache = []; //改进:缓存池子
+
     colls();
+
+    //第一次调用.
+    getData({
+        data:{
+            start:0,
+            count:count
+        },
+        callBack:function(res){
+            var movie = formatData(res);
+            renderData(movie);// 把整理好的数据渲染.
+        }
+    });
 
     window.addEventListener('scroll',function(){
         var sheight = document.body.scrollTop + window.innerHeight;
@@ -75,16 +89,7 @@
             var lastIndexHeight = lastDom.offsetTop + (lastDom.offsetHeight/2);
             if(lastIndexHeight < sheight){
                 toggle =false;
-                getData({
-                    data:{
-                        start:start,
-                        count:count
-                    },
-                    callBack:function(res){
-                        var movie = formatData(res);
-                        renderData(movie);// 把整理好的数据渲染.
-                    }
-                });
+                renderData(cache);// 从缓存数据渲染.
             }
 
         }
@@ -160,6 +165,18 @@
         })();
         start +=20;
 
+        getData({
+            data:{
+                start:start,
+                count:count
+            },
+            callBack:function(res){
+                cache=[]; //每次先清空缓存池子
+                var movie = formatData(res);
+                cache = movie;
+            }
+        });
+
 
     }
 
@@ -179,16 +196,7 @@
         });
     }
 
-    getData({
-        data:{
-            start:0,
-            count:count
-        },
-        callBack:function(res){
-            var movie = formatData(res);
-            renderData(movie);// 把整理好的数据渲染.
-        }
-    });
+
 
 
 
