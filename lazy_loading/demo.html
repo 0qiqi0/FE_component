@@ -30,7 +30,6 @@
 </div>
 
 <script type="text/javascript">
-    //分析:
     /*
      0:初始化--
         A:初始化盒子宽度
@@ -65,13 +64,14 @@
             num = 0,
             oCon = document.querySelector('.container'),
             arrTop =[],arrLeft =[],outTimer,lastDom =null,toggle = false,  //存第一行的
-            wW = window.innerWidth; //浏览器宽度
+            wW = window.innerWidth;      //浏览器宽度
 
-    var cache = []; //改进:缓存池子
+    //缓存池子
+    var cache = [];
 
     colls();
 
-    //第一次调用.
+    //第一次调用. 先拿20条
     getData({
         data:{
             start:0,
@@ -79,11 +79,14 @@
         },
         callBack:function(res){
             var movie = formatData(res);
-            renderData(movie);// 把整理好的数据渲染.
+            renderData(movie);           //数据渲染.
         }
     });
 
+    //发生满足条件的滚动才把缓存池中的数据渲染上去.
     window.addEventListener('scroll',function(){
+        //scrollTop: 代表在有滚动条时，滚动条向下滚动的距离也就是元素顶部被遮住部分的高度。
+        //innerheight:浏览器窗口的视口（viewport）高度（以像素为单位），如果存在水平滚动条，则包括它。
         var sheight = document.body.scrollTop + window.innerHeight;
         if(toggle){
             var lastIndexHeight = lastDom.offsetTop + (lastDom.offsetHeight/2);
@@ -91,7 +94,6 @@
                 toggle =false;
                 renderData(cache);// 从缓存数据渲染.
             }
-
         }
     });
 
@@ -105,25 +107,23 @@
                 original_title: item.original_title,
                 year:item.year,
                 score:item.rating.average
-
             })
         })
         console.log(movie);
         return movie;
     }
 
-    //数据模板
+    //渲染数据(模板)
     function renderData(data){
         var index = 0;
         var length = data.length;
         //var item = data[5];
         console.log(111,data[0]);
 
-        //等前一条数据渲染完后,在渲染第二个
-        //递归渲染
-        (function recur(){  //自执行
+        //递归渲染.等前一条数据渲染完后,在渲染第二个
+        (function recur(){
             var item = data[index];
-            var minIndex = arrTop.indexOf(Math.min(...arrTop)); //高度最小的值的元素下标
+            var minIndex = arrTop.indexOf(Math.min(...arrTop));  //高度最小的值的元素下标
 
             var oDiv = document.createElement('div');
             oDiv.className = 'movie';
@@ -142,7 +142,6 @@
             <span class="score mr15">${item.score}</span>
         </p>
         `;
-            //console.log(888,oDiv);
             oDiv.style.top = oDiv.style.left = '0px';
 
             //oDiv.style.top = arrTop[index] + 'px';
@@ -151,20 +150,22 @@
             oCon.appendChild(oDiv);
             oDiv.querySelector('img').onload = function(){
                 clearTimeout(outTimer);
+
                 outTimer = setTimeout(function(){
                     oDiv.style.left = arrLeft[minIndex] + 'px';
                     oDiv.style.top =  arrTop[minIndex] + 'px';
-                    arrTop[minIndex] +=oDiv.offsetHeight + 2*space;
+                    arrTop[minIndex] +=oDiv.offsetHeight + 2*space; // offsetHeight:包括padding,border,水平滚动条,不包括margin
                     index++;
 
-                    (index ===length -1) &&(lastDom = oDiv,toggle=true);
-                    index<length&&recur(); //短路执行
+                    (index ===length -1) &&(lastDom = oDiv,toggle=true); //toggle防止没加载完本次的20条之前滚动渲染数据.
+                    index<length&& recur(); //循环处. 短路执行
                 },50);
             }
 
         })();
-        start +=20;
 
+        start +=20;
+        //渲染完成本次,再拿20个,存入缓存池
         getData({
             data:{
                 start:start,
@@ -177,9 +178,7 @@
             }
         });
 
-
     }
-
 
     //数据获取
     function getData(opt){
@@ -192,23 +191,18 @@
                 var data = JSON.parse(res);
                 opt['callBack'] && opt['callBack'](data);
             }
-
         });
     }
 
 
-
-
-
-    //格式整理
+    //格式整理,只有一排
     function colls() {
         num = ~~(wW / outerWidth); //算几列
-        oCon.style.width =num*outerWidth -space +'px';
+        oCon.style.width =num*outerWidth -space +'px'; //最左最右的无间隙
         for(var i=0;i<num;i++){
             arrTop.push(0);
             arrLeft.push(i*outerWidth);
         }
-
     }
 
 
@@ -217,7 +211,7 @@
 
 </body>
 </html>
-<!--
+<!--引申:
     parseInt:
     Math.floor:
     位运算: (wW / outerWidth) | 0 , (wW / outerWidth) >> 0,~~(wW / outerWidth);
@@ -230,7 +224,7 @@
 
 
     后端直接给前端对象和eval非常危险,传字符串就好.
-    showapi.com 练习数据整理.
+    showapi.com.
     es6 文本域;
     纯函数: 输入--处理--输出--不对外界产生反应.好处:拿到哪里都能用,出bug少
 
