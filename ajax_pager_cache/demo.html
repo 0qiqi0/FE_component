@@ -47,30 +47,27 @@
     */
 
     var url = 'https://route.showapi.com/181-1';
-            //'?showapi_appid=30' +
-            //'603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8'
-
     var oCon = document.querySelector('.content');
     var page =0;
     var start = 0;
 
-    var cache = [];
+    //var cache = {};
     var oUl= document.querySelector('ul');
 
     oUl.addEventListener('click',function(event){
-        console.log(event);
         if(event.target.tagName.toLowerCase() ==='li'){
             var listPage = event.target.innerText;
             page = listPage * 8-8;
             start = listPage;
-            if(start in cache){
-                showPage(cache[start]);
-                console.log('old')
 
+            //if(start in cache){
+             if(fnCache.check(start)){
+                //showPage(cache[start]);
+                showPage(fnCache.get(start));
+                console.log('old')
             } else {
                 getJson();
                 console.log('new')
-
             }
         }
     },false);
@@ -79,7 +76,6 @@
     getJson();
 
     function getJson(){
-        console.time('qq');
         var params = [];
         var sendData = {
             showapi_appid:'30603',
@@ -103,8 +99,8 @@
             if(xmlHttp.readyState ===4 && xmlHttp.status ===200){
                 var data  = JSON.parse(xmlHttp.response);
                 showPage(data);
-                cache[start] = data;
-                console.timeEnd('qq');
+                //cache[start] = data;
+                fnCache.save(start,data);
             }
         }
     }
@@ -124,9 +120,27 @@
                     `<div class="ft">&GT;</div>`+
                     `</a>`;
         }
-        //console.log(len);
         oCon.innerHTML = str;
     }
+
+    //数据缓存闭包:
+    var fnCache =(function (){
+        var cacheData ={};
+        return{
+            check:function (key){
+                return  (key in cacheData)? true:false;
+            },
+            get: function(key){
+                return (key in cacheData )? cacheData[key]:[];
+            },
+            save:function(key,value){
+                cacheData[key] = value;
+            },
+            clear:function(key){
+                delete cacheData[key];
+            }
+        }
+    })();
 
 
 </script>
