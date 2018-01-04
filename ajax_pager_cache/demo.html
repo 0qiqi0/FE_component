@@ -3,7 +3,7 @@
 <head>
     <title>index</title>
     <meta charset="utf-8">
-    <meta name="Author" content="海牙">
+    <meta name="Author" content='qiqi'>
     <link rel="stylesheet" href="demo.css" type="text/css">
 </head>
 
@@ -36,36 +36,57 @@
 
 <script>
     /*
-        分析:
+        分析:(减轻服务器压力,减少io单次请求数据)
             获取数据(ajax-fetch)
-                //https://route.showapi.com/181-1?
-                showapi_appid=30603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8
+                //https://route.showapi.com/181-1?showapi_appid=30603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8
                 增加安全性:md5加密和sha1加密
 
             分析-渲染数据
 
-            分页处理
-
+            分页处理,打闭包,定时清理.
     */
-
 
     var url = 'https://route.showapi.com/181-1';
             //'?showapi_appid=30' +
             //'603&showapi_sign=98960666afeb4992ae91971d13494090&page=1&num=8'
 
     var oCon = document.querySelector('.content');
+    var page =0;
+    var start = 0;
 
-    var page =1;
+    var cache = [];
+    var oUl= document.querySelector('ul');
+
+    oUl.addEventListener('click',function(event){
+        console.log(event);
+        if(event.target.tagName.toLowerCase() ==='li'){
+            var listPage = event.target.innerText;
+            page = listPage * 8-8;
+            start = listPage;
+            if(start in cache){
+                showPage(cache[start]);
+                console.log('old')
+
+            } else {
+                getJson();
+                console.log('new')
+
+            }
+        }
+    },false);
+
+
     getJson();
 
     function getJson(){
+        console.time('qq');
         var params = [];
         var sendData = {
             showapi_appid:'30603',
             showapi_sign :'98960666afeb4992ae91971d13494090',
             page:page,
             num:8
-        }
+        };
 
         for(var key in sendData){
             params.push(key+'='+sendData[key]);
@@ -81,7 +102,9 @@
             //    2:send发送完成,3:解析响应内容;4解析完成,可以使用数据
             if(xmlHttp.readyState ===4 && xmlHttp.status ===200){
                 var data  = JSON.parse(xmlHttp.response);
-                showPage(data)
+                showPage(data);
+                cache[start] = data;
+                console.timeEnd('qq');
             }
         }
     }
@@ -100,12 +123,10 @@
                     `</div>`+
                     `<div class="ft">&GT;</div>`+
                     `</a>`;
-
         }
-
+        //console.log(len);
         oCon.innerHTML = str;
     }
-
 
 
 </script>
