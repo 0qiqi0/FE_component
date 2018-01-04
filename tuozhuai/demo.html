@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="Author" content='qiqi'>
+    <link rel="stylesheet" href="demo.css" type="text/css">
+</head>
+
+<body>
+
+    <div class="photo">
+        <ul>
+            <li><img src="img/e1.png" alt=""></li>
+            <li><img src="img/e2.png" alt=""></li>
+            <li><img src="img/e3.png" alt=""></li>
+            <li><img src="img/e4.png" alt=""></li>
+            <li><img src="img/e5.png" alt=""></li>
+            <li><img src="img/e6.png" alt=""></li>
+            <li><img src="img/e7.png" alt=""></li>
+            <li><img src="img/e8.png" alt=""></li>
+            <li><img src="img/e9.png" alt=""></li>
+        </ul>
+
+    </div>
+
+<script>
+    /*
+        1将图片改为定位布局:
+            1.1获取li元素
+            1.2获取li元素的当前位置,用数组存起来
+            1.3给li元素设置定位属性,并设置相应的位置值
+        2每个元素能够拖拽
+            2.1
+    */
+
+    var aLi =document.getElementsByTagName('li');
+    var len = aLi.length;
+    var aLiOffset =[];     //存放位置值
+    for(var i=0;i<len;i++){
+        //console.log(aLi[i].offsetTop);
+        aLiOffset.push([aLi[i].offsetTop,aLi[i].offsetLeft]);
+    }
+
+    for(var m=0;m<len;m++){
+        aLi[m].style.position='absolute';
+        aLi[m].style.top  = aLiOffset[m][0]+'px';
+        aLi[m].style.left = aLiOffset[m][1]+'px';
+        aLi[m].style.margin = 0;
+    }
+
+    for(var k=0;k<len;k++){
+        aLi[k].onmousedown = function(){
+            var self = this;
+
+
+        }
+
+    }
+
+
+
+</script>
+</body>
+</html>
