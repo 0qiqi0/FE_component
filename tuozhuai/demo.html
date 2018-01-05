@@ -25,40 +25,127 @@
     </div>
 
 <script>
-    /*
-        1将图片改为定位布局:
-            1.1获取li元素
-            1.2获取li元素的当前位置,用数组存起来
-            1.3给li元素设置定位属性,并设置相应的位置值
-        2每个元素能够拖拽
-            2.1
-    */
 
     var aLi =document.getElementsByTagName('li');
+    var photo = document.getElementsByClassName('photo')[0]
     var len = aLi.length;
     var aLiOffset =[];     //存放位置值
-    for(var i=0;i<len;i++){
-        //console.log(aLi[i].offsetTop);
-        aLiOffset.push([aLi[i].offsetTop,aLi[i].offsetLeft]);
-    }
+    var goalLi;
+    var z =1;
 
     for(var m=0;m<len;m++){
-        aLi[m].style.position='absolute';
-        aLi[m].style.top  = aLiOffset[m][0]+'px';
-        aLi[m].style.left = aLiOffset[m][1]+'px';
-        aLi[m].style.margin = 0;
+        //console.log(aLi[i].offsetTop);
+        aLiOffset.push([aLi[m].offsetTop,aLi[m].offsetLeft]);
+        ~~function(m){  //可用闭包也可以用let m=0
+            setTimeout(function(){
+                aLi[m].style.position='absolute';
+                aLi[m].style.top  = aLiOffset[m][0]+'px';
+                aLi[m].style.left = aLiOffset[m][1]+'px';
+                aLi[m].style.margin = 0;
+            },0)
+        }(m);
     }
+
+
+
 
     for(var k=0;k<len;k++){
         aLi[k].onmousedown = function(){
             var self = this;
+            var selfL = self.offsetLeft; //元素原始x轴位置值
+            var selfT = self.offsetTop;
 
+            //获取鼠标点击的位置.
+            var ev =window.event || ev; //clientX
+            var x0 = ev.clientX;
+            var y0 = ev.clientY;
 
+            document.onmousemove =function(){
+                var ev =window.event || ev;
+                var x1 = ev.clientX;
+                var y1 = ev.clientY;
+                //元素的新位置
+                var xofferset = selfL + x1 -x0;
+                var yofferset = selfT + y1 -y0;
+                self.style.left = xofferset+'px';
+                self.style.top = yofferset+'px';
+                self.style.zIndex =z++;
+
+                //坐标转换
+                var xR =x1 -photo.offsetLeft;
+                var yR =y1 -photo.offsetTop;
+                //碰撞检测:光标是用户意志的体现.
+
+                for(var n=0;n<len;n++){
+                    aLi[n].style.transform ='';
+                    aLi[n].style.boxShadow ='';
+
+                    if(
+                            aLi[n]!=self
+                            && xR>aLi[n].offsetLeft
+                            && xR<aLi[n].offsetLeft+200
+                            && yR>aLi[n].offsetTop
+                            && yR<aLi[n].offsetTop +120
+
+                    ){
+                        console.log('okkkkkk',aLi[n],self);
+                        aLi[n].style.transform ='scale(1.06)';
+                        aLi[n].style.boxShadow ='0px 0px 10px pink';
+                        goalLi = aLi[n];
+                    }
+
+                }
+
+            };
+
+            document.onmouseup = function(){
+                if(goalLi){
+                    self.style.left = goalLi.offsetLeft+'px';
+                    self.style.top = goalLi.offsetTop+'px';
+                    goalLi.style.left =  selfL+'px';
+                    goalLi.style.top  =  selfT+'px';
+                    //重置目标元素的样式
+                    goalLi.style.transform ='';
+                    goalLi.style.boxShadow ='';
+
+                    goalLi ='';
+                    self  = '';
+                } else {
+                    self.style.left = selfL;
+                    self.style.top = selfT;
+                }
+                document.onmousemove ='';
+
+            };
+            //清除鼠标默认事件
+            return false;
         }
-
     }
 
+    //优化:了解才能改;
 
+    photo.addEventListener('mousedown',drag,false);
+    document.addEventListener('mousemove',drag,false);
+    document.addEventListener('mouseup',drag,false);
+
+    var toggle;
+    function drag(){
+        var ev =window.event || ev;
+        ev.preventDefault();
+        switch(e.type){
+            case "mousedown":
+                if(ev.target.parentNode.tagName.toLowerCase() === 'li'){
+                    toggle = true;
+                }
+                break;
+            case "mousemove":
+                if(toggle){
+
+                }
+            case "mouseup":
+
+        }
+    }
 
 </script>
 </body>
