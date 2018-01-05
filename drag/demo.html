@@ -36,6 +36,8 @@
     var goalLi;            //目标位置
     var z =1;
 
+
+
     //修改position为绝对定位
     for(let m=0;m<len;m++){
         //console.log(aLi[i].offsetTop);
@@ -91,7 +93,8 @@
                     aLi[n].style.transform ='';
                     aLi[n].style.boxShadow ='';
 
-                    if(
+                    if(aLi[n]!= self&&
+
                             xofferset +100>aLi[n].offsetLeft
                             && xofferset +100<aLi[n].offsetLeft+200
                             && yofferset +60>aLi[n].offsetTop
@@ -131,9 +134,7 @@
                     self.style.top = selfT + 'px';
                 }
                 document.onmousemove ='';
-
             };
-
             //清除鼠标默认事件
             return false;
         }
@@ -141,30 +142,115 @@
 
 
 
- /*   //优化:了解才能改;
+    //优化:了解才能改;
+    /*var photo = document.getElementsByClassName('photo')[0];
     photo.addEventListener('mousedown',drag,false);
     document.addEventListener('mousemove',drag,false);
     document.addEventListener('mouseup',drag,false);
 
+    var aLi =document.getElementsByTagName('li');
+
     var toggle;
+    var aLiOffset =[];     //存放位置值
+    var goalLi;            //目标位置
+    var z =1;
+    var self='';
+
+    var selfL = 0; //元素原始x轴位置值
+    var selfT = 0;
+
+    var x0 = 0;
+    var y0 = 0;
+
+    var x1 = 0;
+    var y1 = 0;
+
+    var xofferset = 0;
+    var yofferset = 0;
+    var len = aLi.length;
+
     function drag(){
         var ev =window.event || ev;
         ev.preventDefault();
-        switch(e.type){
+
+        switch(ev.type){
             case "mousedown":
                 if(ev.target.parentNode.tagName.toLowerCase() === 'li'){
                     toggle = true;
+                    self  = ev.target;
+                    console.log('fail-------',self);
+
+                    selfL = self.offsetLeft; //元素原始x轴位置值
+                    selfT = self.offsetTop;
+
+                    //获取鼠标点击的位置.
+                    x0 = ev.clientX;
+                    y0 = ev.clientY;
                 }
                 break;
             case "mousemove":
                 if(toggle){
 
+                    x1 = ev.clientX;
+                    y1 = ev.clientY;
+
+                    //元素的新位置
+                    xofferset = selfL + x1 -x0;
+                    yofferset = selfT + y1 -y0;
+
+                    self.style.left = xofferset+'px';
+                    self.style.top  = yofferset+'px';
+                    self.style.zIndex = z++;
+
+                    //碰撞检测:光标--用户意志的体现.
+                    for(var n=0;n<len;n++){
+                        aLi[n].style.transform ='';
+                        aLi[n].style.boxShadow ='';
+
+                        if(aLi[n]!= self&&
+
+                                xofferset +100>aLi[n].offsetLeft
+                                && xofferset +100<aLi[n].offsetLeft+200
+                                && yofferset +60>aLi[n].offsetTop
+                                && yofferset +60<aLi[n].offsetTop +120
+                        ){
+                            //console.log('okkkkkk',aLi[n],self);
+                            aLi[n].style.transform ='scale(1.06)';
+                            aLi[n].style.boxShadow ='0px 0px 10px pink';
+                            goalLi = aLi[n];
+                            console.log('ok-------',goalLi);
+                        }
+
+                    }
+
                 }
             case "mouseup":
+                if(goalLi){
+                    //console.log('ok-------');
 
+                    self.style.left = goalLi.offsetLeft+'px';
+                    self.style.top = goalLi.offsetTop+'px';
+
+                    goalLi.style.left =  selfL+'px';
+                    goalLi.style.top  =  selfT+'px';
+
+                    //重置目标元素的样式
+                    goalLi.style.transform ='';
+                    goalLi.style.boxShadow ='';
+
+                    goalLi ='';
+                    self  = '';
+                } else {
+                    console.log('11111',self);
+
+                    self.style.left = selfL+'px';
+                    self.style.top = selfT + 'px';
+                }
+                toggle = false;
+                document.onmousemove ='';
         }
-    }*/
-
+    }
+     */
 
 </script>
 </body>
