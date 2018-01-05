@@ -9,17 +9,17 @@
 
 <body>
 
-    <div class="photo">
-        <ul>
-            <li><img src="img/e1.png" alt=""></li>
-            <li><img src="img/e2.png" alt=""></li>
-            <li><img src="img/e3.png" alt=""></li>
-            <li><img src="img/e4.png" alt=""></li>
-            <li><img src="img/e5.png" alt=""></li>
-            <li><img src="img/e6.png" alt=""></li>
-            <li><img src="img/e7.png" alt=""></li>
-            <li><img src="img/e8.png" alt=""></li>
-            <li><img src="img/e9.png" alt=""></li>
+    <div class="all">
+        <ul class="photo">
+            <li><img src="img/e1.png" alt="" class="a"></li>
+            <li><img src="img/e2.png" alt="" class="b"></li>
+            <li><img src="img/e3.png" alt="" class="d"></li>
+            <li><img src="img/e4.png" alt="" class="e"></li>
+            <li><img src="img/e5.png" alt="" class="f"></li>
+            <li><img src="img/e6.png" alt="" class="g"></li>
+            <li><img src="img/e7.png" alt="" class="h"></li>
+            <li><img src="img/e8.png" alt="" class="i"></li>
+            <li><img src="img/e9.png" alt="" class="k"></li>
         </ul>
 
     </div>
@@ -27,71 +27,81 @@
 <script>
 
     var aLi =document.getElementsByTagName('li');
-    var photo = document.getElementsByClassName('photo')[0]
+    var photo = document.getElementsByClassName('photo')[0];
+    console.log('wwwwwww',photo);
+
     var len = aLi.length;
+
     var aLiOffset =[];     //存放位置值
-    var goalLi;
+    var goalLi;            //目标位置
     var z =1;
 
-    for(var m=0;m<len;m++){
+    //修改position为绝对定位
+    for(let m=0;m<len;m++){
         //console.log(aLi[i].offsetTop);
         aLiOffset.push([aLi[m].offsetTop,aLi[m].offsetLeft]);
-        ~~function(m){  //可用闭包也可以用let m=0
+        //~~function(m){     //可用闭包也可以用let m=0
             setTimeout(function(){
-                aLi[m].style.position='absolute';
+                aLi[m].style.position = 'absolute';
                 aLi[m].style.top  = aLiOffset[m][0]+'px';
                 aLi[m].style.left = aLiOffset[m][1]+'px';
                 aLi[m].style.margin = 0;
-            },0)
-        }(m);
+            },0);
+        //}(m);
     }
 
 
-
-
+    //给每个li绑定事件
     for(var k=0;k<len;k++){
+
         aLi[k].onmousedown = function(){
-            var self = this;
+
+            var self  = this;
+            console.log('b------',self.offsetLeft,self.offsetTop);
+
             var selfL = self.offsetLeft; //元素原始x轴位置值
             var selfT = self.offsetTop;
 
             //获取鼠标点击的位置.
-            var ev =window.event || ev; //clientX
+            var ev = window.event || ev; //clientX
             var x0 = ev.clientX;
             var y0 = ev.clientY;
 
             document.onmousemove =function(){
-                var ev =window.event || ev;
+                var ev = window.event || ev;
                 var x1 = ev.clientX;
                 var y1 = ev.clientY;
+
                 //元素的新位置
                 var xofferset = selfL + x1 -x0;
                 var yofferset = selfT + y1 -y0;
+
                 self.style.left = xofferset+'px';
-                self.style.top = yofferset+'px';
-                self.style.zIndex =z++;
+                self.style.top  = yofferset+'px';
+                self.style.zIndex = z++;
 
                 //坐标转换
-                var xR =x1 -photo.offsetLeft;
-                var yR =y1 -photo.offsetTop;
-                //碰撞检测:光标是用户意志的体现.
+                //var xR = x1 -photo.offsetLeft;
+                //var yR = y1 -photo.offsetTop;
+                //console.log('rrrrrr',x1,photo.offsetLeft,xR,yR);
+                //console.log('rrrrrr',xofferset,yofferset);
 
+                //碰撞检测:光标--用户意志的体现.
                 for(var n=0;n<len;n++){
                     aLi[n].style.transform ='';
                     aLi[n].style.boxShadow ='';
 
                     if(
-                            aLi[n]!=self
-                            && xR>aLi[n].offsetLeft
-                            && xR<aLi[n].offsetLeft+200
-                            && yR>aLi[n].offsetTop
-                            && yR<aLi[n].offsetTop +120
-
+                            xofferset +100>aLi[n].offsetLeft
+                            && xofferset +100<aLi[n].offsetLeft+200
+                            && yofferset +60>aLi[n].offsetTop
+                            && yofferset +60<aLi[n].offsetTop +120
                     ){
-                        console.log('okkkkkk',aLi[n],self);
+                        //console.log('okkkkkk',aLi[n],self);
                         aLi[n].style.transform ='scale(1.06)';
                         aLi[n].style.boxShadow ='0px 0px 10px pink';
                         goalLi = aLi[n];
+                        console.log('ok-------',goalLi);
                     }
 
                 }
@@ -100,10 +110,14 @@
 
             document.onmouseup = function(){
                 if(goalLi){
+                    //console.log('ok-------');
+
                     self.style.left = goalLi.offsetLeft+'px';
                     self.style.top = goalLi.offsetTop+'px';
+
                     goalLi.style.left =  selfL+'px';
                     goalLi.style.top  =  selfT+'px';
+
                     //重置目标元素的样式
                     goalLi.style.transform ='';
                     goalLi.style.boxShadow ='';
@@ -111,19 +125,23 @@
                     goalLi ='';
                     self  = '';
                 } else {
-                    self.style.left = selfL;
-                    self.style.top = selfT;
+                   // console.log('fail-------',self,selfL);
+
+                    self.style.left = selfL+'px';
+                    self.style.top = selfT + 'px';
                 }
                 document.onmousemove ='';
 
             };
+
             //清除鼠标默认事件
             return false;
         }
     }
 
-    //优化:了解才能改;
 
+
+ /*   //优化:了解才能改;
     photo.addEventListener('mousedown',drag,false);
     document.addEventListener('mousemove',drag,false);
     document.addEventListener('mouseup',drag,false);
@@ -145,8 +163,10 @@
             case "mouseup":
 
         }
-    }
+    }*/
+
 
 </script>
 </body>
 </html>
+
