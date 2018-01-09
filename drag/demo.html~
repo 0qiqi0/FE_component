@@ -21,17 +21,22 @@
             <li><img src="img/e8.png" alt="" class="i"></li>
             <li><img src="img/e9.png" alt="" class="k"></li>
         </ul>
+
     </div>
 
 <script>
 
     var aLi =document.getElementsByTagName('li');
     var photo = document.getElementsByClassName('photo')[0];
+    console.log('wwwwwww',photo);
+
     var len = aLi.length;
 
     var aLiOffset =[];     //存放位置值
     var goalLi;            //目标位置
     var z =1;
+
+
 
     //修改position为绝对定位
     for(let m=0;m<len;m++){
@@ -54,7 +59,8 @@
         aLi[k].onmousedown = function(){
 
             var self  = this;
-            //console.log('b------',self.offsetLeft,self.offsetTop);
+            console.log('b------',self.offsetLeft,self.offsetTop);
+
             var selfL = self.offsetLeft; //元素原始x轴位置值
             var selfT = self.offsetTop;
 
@@ -88,6 +94,7 @@
                     aLi[n].style.boxShadow ='';
 
                     if(aLi[n]!= self&&
+
                             xofferset +100>aLi[n].offsetLeft
                             && xofferset +100<aLi[n].offsetLeft+200
                             && yofferset +60>aLi[n].offsetTop
@@ -106,6 +113,7 @@
 
             document.onmouseup = function(){
                 if(goalLi){
+                    //console.log('ok-------');
 
                     self.style.left = goalLi.offsetLeft+'px';
                     self.style.top = goalLi.offsetTop+'px';
@@ -131,6 +139,7 @@
             return false;
         }
     }
+
 
 
     //优化:了解才能改;
