@@ -21,6 +21,7 @@
 </div>
 
 
+
 <h3>demo2:</h3>
 <h3>垂直方向/自适应</h3>
 
@@ -72,10 +73,12 @@
 <script type="text/javascript" src="slide.js"></script>
 <script type="text/javascript">
 
-  //demo1
+  //demo1:传入id已经方向.
   var demo1 = new iceSkating({
     containerId: '#icbase'
   });
+
+
 
   //demo2
   var demo2 = new iceSkating({
@@ -83,9 +86,10 @@
     direction: 'y'
   });
 
+
+
   //demo3和4的按钮元素
   var demo3paginations = [].slice.call(document.querySelector('#icyp').children);
-  //console.log(demo3paginations)
   var demo4paginations = [].slice.call(document.querySelector('#icxp').children);
 
   //按钮样式切换:当前展现的或者被按的颜色变化

@@ -4,15 +4,12 @@
 //AMD
 (function (global, factory) {
 
-  //console.log('2323',module)
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
       (factory((global)));
 
 }(this, (function (exports) {
-  //自执行函数:传入this和一个函数
   'use strict';
-  //console.log('2323',module,exports)
 
   var isInit = false;
   var mainStore = Object.create(null);
@@ -34,7 +31,7 @@
       childWidth = container.children[0].offsetWidth,  //包含border,padding,content的宽度
       childHeight = container.children[0].offsetHeight;
 
-    //定义当前对象的store,顺便存储它
+    //定义当前对象的store,顺便存储于全局变量中
     ic.store = mainStore[id] = {
       id: id,
       container: container,
@@ -79,6 +76,7 @@
       state.currStore = mainStore[e.currentTarget.id];
       state.touchEnd = state.touchMove = false;
       state.touchStart = true;
+
       state.diffX = state.diffY = 0;
       state.animatingX = state.animatingY = 0;
     };
@@ -150,7 +148,7 @@
         recover(currStore, currStore.translateX, currStore.translateY, 0);
 
       }else{
-
+        //条件满足可以移动
         //真正的移动.
         if(state.diffX > 0 || state.diffY > 0) {
           moveTo(currStore, currStore.index - 1);
@@ -171,7 +169,7 @@
 
         if(currStore.direction === 'x'){
           recover(currStore, -index * currStore.childWidth, 0, 0);
-          currStore.translateX = -index * currStore.childWidth; //记录上一次的成功滑动.
+          currStore.translateX = -index * currStore.childWidth; //记录上一次的成功的滑动了多少.
         }else{
           recover(currStore, 0 , -index * currStore.childHeight, 0);
           currStore.translateY = -index * currStore.childHeight;
@@ -190,9 +188,10 @@
 
 
     var recover = function(store, x, y, z){
-
       store.animating = true;
+      //过渡的持续时间配置
       transitionDuration(store.container, store.animationDuration);
+      //真正的移动
       translate(store.container, x, y, z);
     };
 
@@ -311,8 +310,6 @@
 
 
 
-
-
   iceSkating.prototype = {
     addEvent: function(target, type, fn, capture){
       target.addEventListener(type, fn, capture);
@@ -332,6 +329,7 @@
     }
   };
 
+  //导出构造器
   exports.iceSkating = iceSkating;
 
 })));
