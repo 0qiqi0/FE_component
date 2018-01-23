@@ -15,7 +15,7 @@
        <!-- <a href="http://mp.weixin.qq.com/s/hSI0RNGR23KetTFLoYP7dQ" class="items flex_row">
             <div class="img"><img src="http://www.tanzhouphp.com/tanzhoue/images/newsList/1.jpg" alt=""></div>
             <div class="bd">
-                <p class="label">说来也是惨，古生物学家好像特别容易被假化石坑到呢……</p>
+                <p class="label">科学家容易被假现象坑到</p>
             </div>
             <div class="ft">&GT;</div>
         </a>-->
@@ -111,7 +111,7 @@
         var data =data.showapi_res_body.newslist;
         var str ='';
         for(var i= 0,len=data.length;i<len;i++){
-
+            //需要自己拼字符串,前端的模板问题.
             str +=`<a href="${data[i].url}" class="items flex_row">`+
                     `<div class="img"><img src="${data[i].picUrl}" alt=""></div>`+
                     `<div class="bd">`+
@@ -122,6 +122,7 @@
         }
         oCon.innerHTML = str;
     }
+
 
     //数据缓存闭包:
     var fnCache =(function (){

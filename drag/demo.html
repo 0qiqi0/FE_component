@@ -55,7 +55,7 @@
 
             var self  = this;
             //console.log('b------',self.offsetLeft,self.offsetTop);
-            var selfL = self.offsetLeft; //元素原始x轴位置值
+            var selfL = self.offsetLeft; //元素原始x轴位置值,相对于父元素
             var selfT = self.offsetTop;
 
             //获取鼠标点击的位置.
@@ -64,11 +64,11 @@
             var y0 = ev.clientY;
 
             document.onmousemove =function(){
-                var ev = window.event || ev;
-                var x1 = ev.clientX;
+                var ev = window.event || ev; //目标事件和目标对象不同
+                var x1 = ev.clientX;  //相当于浏览器的
                 var y1 = ev.clientY;
 
-                //元素的新位置
+                //元素的左边/上边线相对于父元素ul的新位置
                 var xofferset = selfL + x1 -x0;
                 var yofferset = selfT + y1 -y0;
 
@@ -82,11 +82,12 @@
                 //console.log('rrrrrr',x1,photo.offsetLeft,xR,yR);
                 //console.log('rrrrrr',xofferset,yofferset);
 
-                //碰撞检测:光标--用户意志的体现.
+                //碰撞检测:光标--用户意志的体现.一共len个元素.
                 for(var n=0;n<len;n++){
                     aLi[n].style.transform ='';
                     aLi[n].style.boxShadow ='';
 
+                    //相当于中心点在被检测对象的中间就..
                     if(aLi[n]!= self&&
                             xofferset +100>aLi[n].offsetLeft
                             && xofferset +100<aLi[n].offsetLeft+200

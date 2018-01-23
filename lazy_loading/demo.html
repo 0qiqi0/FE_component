@@ -60,7 +60,7 @@
 
     var width = 200,start = 0,
             space = 10,
-            outerWidth = width + space,
+            outerWidth = width + space, //每个元素的宽度
             num = 0,
             oCon = document.querySelector('.container'),
             arrTop =[],arrLeft =[],outTimer,lastDom =null,toggle = false,  //存第一行的
@@ -165,6 +165,7 @@
         })();
 
         start +=20;
+
         //渲染完成本次,再拿20个,存入缓存池
         getData({
             data:{
@@ -197,8 +198,9 @@
 
     //格式整理,只有一排
     function colls() {
-        num = ~~(wW / outerWidth); //算几列
+        num = ~~(wW / outerWidth); //算几列.~~省掉小数点
         oCon.style.width =num*outerWidth -space +'px'; //最左最右的无间隙
+        //把第一行的
         for(var i=0;i<num;i++){
             arrTop.push(0);
             arrLeft.push(i*outerWidth);
